@@ -1,5 +1,7 @@
 # ka-obd-lab
 
+Parte 1 da série "projetos de garagem (de quarto)" — [parte 2 foi as luzes RGB](https://github.com/leonardobora/rgb-hub).
+
 Projeto de leitura/telemetria do Ford Ka 2017 via OBD-II, com objetivo de
 evoluir depois pra engenharia reversa do barramento CAN (ver histórico da
 conversa pro plano completo de camadas: OBD genérico -> FORScan/módulos
