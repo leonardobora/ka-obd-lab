@@ -205,12 +205,18 @@
         </div>
         <div class="connection-badge" id="connection-badge">OFFLINE</div>
         <button id="connect-btn">Connect</button>
+        <button id="dtc-btn" title="Read Diagnostic Trouble Codes" style="background: #b71c1c;">DTC</button>
         <input type="text" id="com-port" value="COM5" placeholder="COM port" aria-label="Bluetooth COM port">
         <input type="text" id="wifi-addr" value="192.168.0.10:35000" placeholder="IP:port" aria-label="WiFi IP and port">
         <select id="mode-select" aria-label="Connection mode">
             <option value="bluetooth">Bluetooth</option>
             <option value="wifi">WiFi</option>
             <option value="demo">Demo (HF)</option>
+        </select>
+        <select id="vehicle-select" aria-label="Vehicle" style="margin-left: 4px;">
+            <option value="ford_ka_2017">Ford Ka 2017</option>
+            <option value="corolla_2024">Corolla XEI 2024</option>
+            <option value="etios_13">Etios 1.3</option>
         </select>
     </header>
 
@@ -279,6 +285,38 @@
                 <span class="card-label">Battery Voltage</span>
                 <span class="card-value" id="val-battery">0 V</span>
             </div>
+            <div class="card" id="card-timing">
+                <span class="card-label">Timing Advance</span>
+                <span class="card-value" id="val-timing">--°</span>
+            </div>
+            <div class="card" id="card-o2-sensor1">
+                <span class="card-label">O2 Sensor 1</span>
+                <span class="card-value" id="val-o2-sensor1">-- V</span>
+            </div>
+            <div class="card" id="card-o2-sensor2">
+                <span class="card-label">O2 Sensor 2</span>
+                <span class="card-value" id="val-o2-sensor2">-- V</span>
+            </div>
+            <div class="card" id="card-fuel-trim-short">
+                <span class="card-label">Short Fuel Trim</span>
+                <span class="card-value" id="val-fuel-trim-short">--%</span>
+            </div>
+            <div class="card" id="card-fuel-trim-long">
+                <span class="card-label">Long Fuel Trim</span>
+                <span class="card-value" id="val-fuel-trim-long">--%</span>
+            </div>
+            <div class="card" id="card-run-time">
+                <span class="card-label">Run Time</span>
+                <span class="card-value" id="val-run-time">--</span>
+            </div>
+            <div class="card" id="card-fuel-status">
+                <span class="card-label">Fuel System</span>
+                <span class="card-value" id="val-fuel-status">--</span>
+            </div>
+            <div class="card" id="card-dtc" style="grid-column: 1 / -1;">
+                <span class="card-label">Diagnostic Trouble Codes</span>
+                <span class="card-value" id="val-dtc" style="font-size: 1.1rem; color: var(--green);">No DTCs</span>
+            </div>
         </section>
 
         <section class="chart-section">
@@ -287,6 +325,6 @@
     </main>
 
     <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
-    <script src="/static/app.js?v=4"></script>
+    <script src="/static/app.js?v=6"></script>
 </body>
 </html>

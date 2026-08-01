@@ -10,8 +10,9 @@ function getConfig() {
     const mode = document.getElementById("mode-select").value;
     const comPort = document.getElementById("com-port").value;
     const wifiAddr = document.getElementById("wifi-addr").value;
+    const vehicle = document.getElementById("vehicle-select").value;
     const parts = wifiAddr.split(":");
-    return { mode, comPort, wifiHost: parts[0], wifiPort: parts[1] || "35000" };
+    return { mode, comPort, wifiHost: parts[0], wifiPort: parts[1] || "35000", vehicle };
 }
 
 function setConnectionState(state, message) {
@@ -60,7 +61,7 @@ function connectWebSocket() {
     ws = new WebSocket(wsUrl);
 
     ws.onopen = function () {
-        const payload = { mode: config.mode };
+        const payload = { mode: config.mode, vehicle: config.vehicle };
         if (config.mode === "bluetooth") {
             payload.port = config.comPort;
         } else if (config.mode === "wifi") {
@@ -118,15 +119,16 @@ function updateDashboard(data) {
     updateCardWithStatus("val-fuel", "card-fuel", data.fuel_level, "%");
     updateCardWithStatus("val-battery", "card-battery", data.battery_voltage, " V");
 
-    addPlotlyTrace(
-        data.timestamp || Date.now(),
-        data.rpm,
-        data.speed,
-        data.coolant_temp,
-        data.throttle_position,
-        data.engine_load
-    );
-}
+    // New PIDs
+    updateCardWithStatus("val-timing", "card-timing", data.timing_advance, "°");
+    updateCardWithStatus("val-o2-sensor1", "card-o2-sensor1", data.o2_sensor1_voltage, " V");
+    updateCardWithStatus("val-o2-sensor2", "card-o2-sensor2", data.o2_sensor2_voltage, " V");
+    updateCardWithStatus("val-fuel-trim-short", "card-fuel-trim-short", data.fuel_trim_short_bank1, "%");
+    updateCardWithStatus("val-fuel-trim-long", "card-fuel-trim-long", data.fuel_trim_long_bank1, "%");
+    
+    updateRunTime("val-run-time", data.run_time);
+    updateText("val-fuel-status", data.fuel_system_status);
+    updateDtcDisplay("val-dtc", data.dtc_codes);
 
     addPlotlyTrace(
         data.timestamp || Date.now(),
@@ -178,6 +180,37 @@ function updateCardWithStatus(valueId, cardId, value, unit) {
             (Number.isInteger(value) ? value : value.toFixed(1)) + unit : 
             value + unit;
         el.classList.remove("na");
+    }
+}
+
+function updateRunTime(id, seconds) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (seconds == null || isNaN(seconds)) {
+        el.textContent = "--";
+        return;
+    }
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    el.textContent = h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
+}
+
+function updateText(id, value) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = value || "--";
+}
+
+function updateDtcDisplay(id, codes) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!codes || codes.length === 0) {
+        el.textContent = "No DTCs";
+        el.style.color = "var(--green)";
+    } else {
+        el.textContent = codes.join(", ");
+        el.style.color = "var(--red)";
     }
 }
 
@@ -256,6 +289,34 @@ function retryConnection() {
     }, 1000);
 }
 
+function fetchDTCs() {
+    const config = getConfig();
+    if (config.mode === "demo") {
+        updateDtcDisplay("val-dtc", []);
+        return;
+    }
+    fetch("/dtc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            mode: config.mode,
+            port: config.comPort,
+            host: config.wifiHost,
+        }),
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            updateDtcDisplay("val-dtc", ["Error: " + data.error]);
+        } else {
+            updateDtcDisplay("val-dtc", data.codes || []);
+        }
+    })
+    .catch(err => {
+        updateDtcDisplay("val-dtc", ["Fetch error"]);
+    });
+}
+
 function init() {
     initPlotly();
     setConnectionState("disconnected");
@@ -268,6 +329,11 @@ function init() {
     const retryBtn = document.getElementById("retry-btn");
     if (retryBtn) {
         retryBtn.addEventListener("click", retryConnection);
+    }
+    
+    const dtcBtn = document.getElementById("dtc-btn");
+    if (dtcBtn) {
+        dtcBtn.addEventListener("click", fetchDTCs);
     }
 }
 

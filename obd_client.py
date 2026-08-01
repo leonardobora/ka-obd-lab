@@ -65,8 +65,8 @@ class ELM327Client:
         time.sleep(1)
         return responses
 
-    def query_pid(self, name: str) -> float:
-        spec = PIDS[name]
+    def query_pid(self, name: str, pids: dict = None) -> float:
+        spec = (pids or PIDS)[name]
         response = self.send(f"{spec['mode']}{spec['pid']}")
         data_bytes = _extract_data_bytes(response, spec["mode"], spec["pid"], spec["bytes"])
         return spec["decode"](data_bytes)
