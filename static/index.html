@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
     <title>Kruka OBD Project</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
@@ -42,12 +43,66 @@
             background: var(--red);
             flex-shrink: 0;
         }
-        .status-dot.connected {
-            background: var(--green);
-            animation: pulse 1.5s infinite;
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .status-dot.disconnected {
-            animation: blink 1s infinite;
+        #status-text {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .connection-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: none;
+        }
+        .connection-badge.offline {
+            background: #3d1f1f;
+            color: #ff5252;
+            border: 1px solid #ff5252;
+        }
+        .connection-badge.connecting {
+            background: #3d3a1f;
+            color: #ffc107;
+            border: 1px solid #ffc107;
+            animation: pulse-badge 1s infinite;
+        }
+        .connection-badge.online {
+            background: #1f3d2a;
+            color: #4caf50;
+            border: 1px solid #4caf50;
+        }
+        .connection-badge.error {
+            background: #3d1f1f;
+            color: #ff5252;
+            border: 1px solid #ff5252;
+            animation: shake 0.5s;
+        }
+        @keyframes pulse-badge {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+        .card.warning {
+            border-color: #ffc107;
+            background: #2a2a1e;
+        }
+        .card.error {
+            border-color: #ff5252;
+            background: #2a1e1e;
+        }
+        .card-value.na {
+            color: #ff5252;
+            font-size: 1.2rem;
         }
         @keyframes pulse {
             0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--green); }
@@ -144,13 +199,18 @@
 <body>
     <header class="top-bar">
         <h1>Kruka OBD Project</h1>
-        <div class="status-dot disconnected" id="status-dot"></div>
+        <div class="status-indicator" id="status-indicator">
+            <div class="status-dot disconnected" id="status-dot"></div>
+            <span id="status-text">Disconnected</span>
+        </div>
+        <div class="connection-badge" id="connection-badge">OFFLINE</div>
         <button id="connect-btn">Connect</button>
         <input type="text" id="com-port" value="COM5" placeholder="COM port" aria-label="Bluetooth COM port">
         <input type="text" id="wifi-addr" value="192.168.0.10:35000" placeholder="IP:port" aria-label="WiFi IP and port">
         <select id="mode-select" aria-label="Connection mode">
             <option value="bluetooth">Bluetooth</option>
             <option value="wifi">WiFi</option>
+            <option value="demo">Demo (HF)</option>
         </select>
     </header>
 
@@ -227,6 +287,6 @@
     </main>
 
     <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
-    <script src="/static/app.js"></script>
+    <script src="/static/app.js?v=4"></script>
 </body>
 </html>

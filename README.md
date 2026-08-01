@@ -1,3 +1,15 @@
+---
+title: Kruka OBD Project
+emoji: 🚗
+colorFrom: blue
+colorTo: green
+sdk: docker
+sdk_version: "latest"
+python_version: "3.11"
+app_file: app.py
+pinned: false
+---
+
 # Kruka OBD Project
 
 Projeto de leitura/telemetria do Ford Ka 2017 (KRU) via OBD-II, com objetivo de
