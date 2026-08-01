@@ -110,6 +110,25 @@ python read_live.py --wifi --host 127.0.0.1 --port 35010
 
 Ja validado localmente (init + decodificacao de rpm/speed/coolant/throttle/engine_load todos corretos contra o mock).
 
+## Web App
+
+O dashboard web permite visualizar as leituras OBD-II em tempo real pelo navegador.
+
+### Executando
+
+```
+python main.py
+```
+
+Abra o navegador em `http://localhost:8000`.
+
+### Funcionamento
+
+- O dashboard conecta automaticamente ao scanner configurado (WiFi ou Bluetooth serial).
+- Se a conexão cair, clique no botão **Retry** para reconectar.
+- **Modo Bluetooth:** configure a porta COM na interface do dashboard.
+- **Modo WiFi:** configure o IP e porta do scanner na interface do dashboard (ex.: `192.168.0.10:35000`).
+
 ## Próximos passos possíveis
 
 - Validar com o scanner real assim que chegar.

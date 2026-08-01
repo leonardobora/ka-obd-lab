@@ -1,0 +1,223 @@
+:root {
+  --bg: #1a1a2e;
+  --card: #16213e;
+  --text: #e0e0e0;
+  --accent: #0f3460;
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --yellow: #f1c40f;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: sans-serif;
+  min-height: 100vh;
+}
+
+#top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--card);
+  padding: 12px 24px;
+  border-bottom: 2px solid var(--accent);
+}
+
+#top-bar .title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--text);
+}
+
+#top-bar .controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.connected {
+  background-color: var(--green);
+  animation: pulse 2s infinite;
+}
+
+.status-dot.disconnected {
+  background-color: var(--red);
+  animation: blink 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 0 6px rgba(46, 204, 113, 0);
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+#gauges {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 24px;
+}
+
+#gauges svg {
+  width: 180px;
+  height: 180px;
+}
+
+#gauges .gauge-arc {
+  fill: none;
+  stroke-width: 12;
+  stroke-linecap: round;
+}
+
+#gauges .gauge-arc-bg {
+  stroke: var(--accent);
+}
+
+#gauges .gauge-arc-fill {
+  stroke: var(--green);
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+#gauges .gauge-needle {
+  stroke: var(--text);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+#gauges .gauge-value {
+  fill: var(--text);
+  font-size: 24px;
+  font-weight: bold;
+  text-anchor: middle;
+}
+
+#gauges .gauge-label {
+  fill: var(--text);
+  font-size: 12px;
+  text-anchor: middle;
+  opacity: 0.8;
+}
+
+#cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 24px;
+}
+
+#cards .card {
+  background-color: var(--card);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid var(--accent);
+}
+
+#cards .card .label {
+  font-size: 0.85rem;
+  color: var(--text);
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+#cards .card .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text);
+}
+
+#chart {
+  width: 100%;
+  height: 400px;
+  background-color: var(--card);
+  border-radius: 8px;
+  margin: 0 24px 24px 24px;
+  border: 1px solid var(--accent);
+}
+
+button {
+  background-color: var(--accent);
+  color: var(--text);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+button:hover {
+  background-color: var(--bg);
+  border-color: var(--text);
+}
+
+input {
+  background-color: var(--card);
+  color: var(--text);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+input:focus {
+  border-color: var(--text);
+}
+
+@media (max-width: 768px) {
+  #cards {
+    grid-template-columns: 1fr;
+  }
+
+  #gauges {
+    flex-direction: column;
+  }
+
+  #top-bar {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  #chart {
+    margin: 0 12px 12px 12px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  #cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

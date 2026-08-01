@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kruka OBD Project</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text: #e0e0e0;
+            --accent: #0f3460;
+            --green: #00e676;
+            --red: #ff1744;
+            --border: #2a2a4a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 20px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .top-bar h1 {
+            font-size: 1.2rem;
+            white-space: nowrap;
+        }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--red);
+            flex-shrink: 0;
+        }
+        .status-dot.connected {
+            background: var(--green);
+            animation: pulse 1.5s infinite;
+        }
+        .status-dot.disconnected {
+            animation: blink 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--green); }
+            50% { opacity: 0.6; box-shadow: 0 0 12px var(--green); }
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+        .top-bar input, .top-bar select {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+        }
+        .top-bar button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            border-radius: 4px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .top-bar button:hover { background: #1a4a7a; }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 24px;
+        }
+        .gauges {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        .gauge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .gauge svg {
+            width: 160px;
+            height: 160px;
+        }
+        .gauge-label {
+            font-size: 0.85rem;
+            color: #a0a0b0;
+        }
+        .gauge-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .card-label {
+            font-size: 0.8rem;
+            color: #a0a0b0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        .chart-section {
+            width: 100%;
+        }
+        #chart {
+            width: 100%;
+            height: 400px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header class="top-bar">
+        <h1>Kruka OBD Project</h1>
+        <div class="status-dot disconnected" id="status-dot"></div>
+        <button id="connect-btn">Connect</button>
+        <input type="text" id="com-port" value="COM5" placeholder="COM port" aria-label="Bluetooth COM port">
+        <input type="text" id="wifi-addr" value="192.168.0.10:35000" placeholder="IP:port" aria-label="WiFi IP and port">
+        <select id="mode-select" aria-label="Connection mode">
+            <option value="bluetooth">Bluetooth</option>
+            <option value="wifi">WiFi</option>
+        </select>
+    </header>
+
+    <main class="main-content">
+        <section class="gauges">
+            <div class="gauge" id="gauge-rpm">
+                <svg viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="#2a2a4a" stroke-width="10"/>
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="#00e676" stroke-width="10"
+                            stroke-dasharray="502.65" stroke-dashoffset="502.65"
+                            stroke-linecap="round" transform="rotate(-90 100 100)"
+                            id="gauge-rpm-arc"/>
+                    <text x="100" y="95" text-anchor="middle" fill="#e0e0e0" font-size="28" font-weight="bold" id="gauge-rpm-text">0</text>
+                    <text x="100" y="120" text-anchor="middle" fill="#a0a0b0" font-size="12">RPM</text>
+                </svg>
+                <span class="gauge-label">RPM</span>
+            </div>
+            <div class="gauge" id="gauge-speed">
+                <svg viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="#2a2a4a" stroke-width="10"/>
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="#448aff" stroke-width="10"
+                            stroke-dasharray="502.65" stroke-dashoffset="502.65"
+                            stroke-linecap="round" transform="rotate(-90 100 100)"
+                            id="gauge-speed-arc"/>
+                    <text x="100" y="95" text-anchor="middle" fill="#e0e0e0" font-size="28" font-weight="bold" id="gauge-speed-text">0</text>
+                    <text x="100" y="120" text-anchor="middle" fill="#a0a0b0" font-size="12">Speed</text>
+                </svg>
+                <span class="gauge-label">Speed</span>
+            </div>
+            <div class="gauge" id="gauge-coolant">
+                <svg viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="#2a2a4a" stroke-width="10"/>
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="#ff6d00" stroke-width="10"
+                            stroke-dasharray="502.65" stroke-dashoffset="502.65"
+                            stroke-linecap="round" transform="rotate(-90 100 100)"
+                            id="gauge-coolant-arc"/>
+                    <text x="100" y="95" text-anchor="middle" fill="#e0e0e0" font-size="28" font-weight="bold" id="gauge-coolant-text">0</text>
+                    <text x="100" y="120" text-anchor="middle" fill="#a0a0b0" font-size="12">Coolant</text>
+                </svg>
+                <span class="gauge-label">Coolant Temp</span>
+            </div>
+        </section>
+
+        <section class="cards">
+            <div class="card" id="card-throttle">
+                <span class="card-label">Throttle Position</span>
+                <span class="card-value" id="val-throttle">0%</span>
+            </div>
+            <div class="card" id="card-engine-load">
+                <span class="card-label">Engine Load</span>
+                <span class="card-value" id="val-engine-load">0%</span>
+            </div>
+            <div class="card" id="card-intake-air">
+                <span class="card-label">Intake Air Temp</span>
+                <span class="card-value" id="val-intake-air">0°C</span>
+            </div>
+            <div class="card" id="card-maf">
+                <span class="card-label">MAF</span>
+                <span class="card-value" id="val-maf">0 g/s</span>
+            </div>
+            <div class="card" id="card-fuel">
+                <span class="card-label">Fuel Level</span>
+                <span class="card-value" id="val-fuel">0%</span>
+            </div>
+            <div class="card" id="card-battery">
+                <span class="card-label">Battery Voltage</span>
+                <span class="card-value" id="val-battery">0 V</span>
+            </div>
+        </section>
+
+        <section class="chart-section">
+            <div id="chart"></div>
+        </section>
+    </main>
+
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
