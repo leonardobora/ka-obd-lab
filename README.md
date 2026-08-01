@@ -1,11 +1,14 @@
-# ka-obd-lab
+# Kruka OBD Project
 
-Parte 1 da série "projetos de garagem (de quarto)" — [parte 2 foi as luzes RGB](https://github.com/leonardobora/rgb-hub).
-
-Projeto de leitura/telemetria do Ford Ka 2017 via OBD-II, com objetivo de
+Projeto de leitura/telemetria do Ford Ka 2017 (KRU) via OBD-II, com objetivo de
 evoluir depois pra engenharia reversa do barramento CAN (ver histórico da
 conversa pro plano completo de camadas: OBD genérico -> FORScan/módulos
 Ford -> sniff bruto de CAN).
+
+## Links
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/kruka)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/kruka)
 
 ## Visão geral do plano
 
@@ -32,8 +35,9 @@ Este repo cobre o **Tier 1**. Os próximos dois ainda são plano, não código.
 
 ## Hardware
 
-Scanner ELM327 WiFi/Bluetooth (Axscan, v2.1) — a caminho. Modo WiFi é o
-recomendado pra automação (vira socket TCP simples, sem pareamento BT).
+Scanner ELM327 Bluetooth (Axscan, v2.1) — pareado com PIN `1234`.
+Modo WiFi e recomendado para automacao (vira socket TCP simples, sem pareamento BT).
+Modo Bluetooth serial funciona mas pode desconectar no Windows — o script tem reconexao automatica e o README tem os passos para estabilizar a conexao.
 
 ## Arquivos
 
@@ -73,14 +77,30 @@ chegar.
 
 ## Uso
 
-Quando o scanner chegar (modo WiFi, IP padrão costuma ser `192.168.0.10:35000`,
-conecta o PC na rede WiFi que o adaptador cria):
+### WiFi (recomendado para automacao)
+
+Quando o scanner estiver em modo WiFi (IP padrao costuma ser `192.168.0.10:35000`, conecta o PC na rede WiFi que o adaptador cria):
 
 ```
 python read_live.py --wifi
 ```
 
-Testar sem o scanner (contra o mock):
+### Bluetooth serial
+
+Se o scanner pareou via Bluetooth mas desconecta no PC (problema conhecido com adaptadores ELM327 baratos no Windows), use o modo serial com reconexao automatica:
+
+```
+python read_live.py --bluetooth COM5
+```
+
+O `--baud` define a velocidade da porta serial (padrao `9600`). Se 9600 nao funcionar, tente `115200` ou `38400`.
+
+**Pra resolver a desconexao no Windows:**
+1. Gerenciador de Dispositivos → Portas (COM & LPT) → propriedades da porta serial do adaptador → Configuracoes da Porta → reduzir "Bits por segundo" para `9600` ou `110`
+2. Desmarque "Permitir que o computador desligue este dispositivo para economizar energia" nas propriedades do adaptador Bluetooth
+3. O script ja tem reconexao automatica — se a conexao cair, ele tenta reconectar a cada 3 segundos
+
+### Testar sem o scanner (contra o mock)
 
 ```
 python mock_elm327.py --port 35010
@@ -88,8 +108,7 @@ python mock_elm327.py --port 35010
 python read_live.py --wifi --host 127.0.0.1 --port 35010
 ```
 
-Já validado localmente (init + decodificação de rpm/speed/coolant/throttle/
-engine_load todos corretos contra o mock).
+Ja validado localmente (init + decodificacao de rpm/speed/coolant/throttle/engine_load todos corretos contra o mock).
 
 ## Próximos passos possíveis
 

@@ -25,8 +25,8 @@ class ELM327Client:
         return cls(sock.makefile("rwb", buffering=0))
 
     @classmethod
-    def serial(cls, com_port, baudrate=38400, timeout=5):
-        import serial  # pyserial -- so precisa disso no modo Bluetooth/USB serial
+    def serial(cls, com_port, baudrate=9600, timeout=5):
+        import serial
 
         ser = serial.Serial(com_port, baudrate=baudrate, timeout=timeout)
         return cls(ser)
@@ -38,7 +38,7 @@ class ELM327Client:
         while time.time() < deadline:
             try:
                 chunk = self._io.read(1)
-            except (socket.timeout, TimeoutError):
+            except (socket.timeout, TimeoutError, OSError):
                 break
             if not chunk:
                 break
@@ -62,6 +62,7 @@ class ELM327Client:
         for cmd in ("ATZ", "ATE0", "ATL0", "ATS0", "ATH0", "ATSP0"):
             responses[cmd] = self.send(cmd)
             time.sleep(0.1)
+        time.sleep(1)
         return responses
 
     def query_pid(self, name: str) -> float:
@@ -75,8 +76,15 @@ class ELM327Client:
 
 
 def _extract_data_bytes(response: str, mode: str, pid: str, expected_len: int) -> list:
-    """A resposta padrao vem tipo '41 0C 1A F8' (modo+0x40, pid, depois os dados)."""
-    hex_tokens = [t for t in response.split() if len(t) == 2 and all(c in "0123456789ABCDEFabcdef" for c in t)]
+    """A resposta pode vir como '41 0C 1A F8' (com espacos) ou '410C1A85' (sem espacos).
+    Pode tambem incluir 'SEARCHING...' como prefixo enquanto o adaptador conecta ao ECU."""
+    response = response.upper()
+    # Remove prefixos de status que podem aparecer antes dos dados reais
+    for prefix in ("SEARCHING...", "UNABLE TO CONNECT", "NO DATA"):
+        if prefix in response:
+            response = response.split(prefix, 1)[1].strip()
+    hex_chars = "".join(c for c in response if c in "0123456789ABCDEF")
+    hex_tokens = [hex_chars[i:i+2] for i in range(0, len(hex_chars), 2) if len(hex_chars[i:i+2]) == 2]
     try:
         pid_index = hex_tokens.index(pid.upper())
     except ValueError:
