@@ -1,16 +1,24 @@
----
-title: Kruka OBD Project
-emoji: 🚗
-colorFrom: blue
-colorTo: green
-sdk: docker
-sdk_version: "latest"
-python_version: "3.11"
-app_file: app.py
-pinned: false
+<p align="center">
+  <img src="banner.png" alt="Kruka OBD Lab" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://github.com/leonardobora/ka-obd-lab/stargazers"><img src="https://img.shields.io/github/stars/leonardobora/ka-obd-lab?style=flat&logo=github&color=f4c542" alt="GitHub Repo stars"></a>
+  <a href="https://github.com/leonardobora/ka-obd-lab/blob/master/LICENSE"><img src="https://img.shields.io/github/license/leonardobora/ka-obd-lab" alt="License"></a>
+  <a href="https://github.com/leonardobora/ka-obd-lab/issues"><img src="https://img.shields.io/github/issues/leonardobora/ka-obd-lab" alt="Issues"></a>
+  <a href="https://github.com/leonardobora/ka-obd-lab/pulls"><img src="https://img.shields.io/github/issues-pr/leonardobora/ka-obd-lab" alt="Pull Requests"></a>
+  <a href="https://github.com/leonardobora/ka-obd-lab/commits"><img src="https://img.shields.io/github/last-commit/leonardobora/ka-obd-lab" alt="Last Commit"></a>
+  <a href="https://github.com/leonardobora/ka-obd-lab"><img src="https://img.shields.io/github/languages/top/leonardobora/ka-obd-lab" alt="Top Language"></a>
+</p>
+
+<p align="center">
+  <b>OBD-II Telemetry & CAN Bus Research for Ford Ka 2017</b><br>
+  <sub>Read live vehicle data via ELM327 — RPM, speed, coolant temp, DTCs, and more.</sub>
+</p>
+
 ---
 
-# Kruka OBD Project
+# Kruka OBD Lab
 
 Projeto de leitura/telemetria do Ford Ka 2017 (KRU) via OBD-II, com objetivo de
 evoluir depois pra engenharia reversa do barramento CAN (ver histórico da
